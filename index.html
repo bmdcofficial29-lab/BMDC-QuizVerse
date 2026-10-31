@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>BMDC QuizVerse — Spin. Play. Learn!</title>
+  <meta name="description" content="BMDC QuizVerse: a colourful learning game for BMDC students. Spin the wheel, take a challenge, learn something new.">
+  <meta name="theme-color" content="#0b1030">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%237c3aed'/%3E%3Ctext x='50' y='66' font-size='52' text-anchor='middle'%3E%F0%9F%8E%AF%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main" data-i18n="app.skip"></a>
+  <div class="bg-decor" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div id="confetti" class="confetti" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <!-- Text-based placeholder logo until BMDC management approves official branding. -->
+    <button type="button" id="brand-home" class="brand" data-i18n-aria-label="nav.home">
+      <span class="brand-badge" aria-hidden="true" data-i18n="app.logoPlaceholder"></span>
+      <span class="brand-name" aria-hidden="true">QuizVerse</span>
+    </button>
+    <button type="button" id="btn-motion" class="toggle" aria-pressed="false">
+      <span data-i18n="motion.label"></span>: <span id="motion-state" class="toggle-state"></span>
+    </button>
+  </header>
+
+  <noscript><p class="noscript" data-i18n="app.noscript">BMDC QuizVerse needs JavaScript. Please turn it on in your browser and reload the page.</p></noscript>
+
+  <main id="main" class="app" tabindex="-1">
+
+    <!-- 1. WELCOME -->
+    <section id="screen-welcome" class="screen" aria-labelledby="welcome-title">
+      <div class="hero">
+        <div id="hero-wheel" class="hero-wheel" aria-hidden="true"></div>
+        <h1 id="welcome-title" data-focus tabindex="-1" data-i18n="app.name"></h1>
+        <p class="tagline" data-i18n="app.tagline"></p>
+        <p class="lead" data-i18n="welcome.intro"></p>
+        <div class="stack">
+          <button type="button" id="btn-start" class="btn btn-primary btn-lg" data-i18n="welcome.start"></button>
+          <button type="button" id="btn-daily" class="btn btn-secondary" data-i18n="welcome.daily" hidden></button>
+        </div>
+        <div class="bank-status" id="bank-status" role="status" aria-live="polite"></div>
+        <p class="fineprint" data-i18n="welcome.note"></p>
+      </div>
+    </section>
+
+    <!-- 2. SETUP -->
+    <section id="screen-setup" class="screen" aria-labelledby="setup-title" hidden>
+      <form id="setup-form" class="card" novalidate>
+        <h2 id="setup-title" data-focus tabindex="-1" data-i18n="setup.title"></h2>
+
+        <div class="field">
+          <label for="student-name" data-i18n="setup.nameLabel"></label>
+          <input id="student-name" name="name" type="text" maxlength="30" autocomplete="off" autocapitalize="words" spellcheck="false" aria-describedby="name-help name-error" data-i18n-placeholder="setup.namePlaceholder">
+          <p id="name-help" class="help" data-i18n="setup.nameHelp"></p>
+          <p id="name-error" class="error" role="alert" hidden></p>
+        </div>
+
+        <div class="field">
+          <label for="department" data-i18n="setup.deptLabel"></label>
+          <select id="department" name="department" aria-describedby="department-error"></select>
+          <p id="department-error" class="error" role="alert" hidden></p>
+        </div>
+
+        <fieldset class="field">
+          <legend data-i18n="setup.diffLabel"></legend>
+          <div id="difficulty-options" class="pills" role="radiogroup" aria-describedby="difficulty-help difficulty-error"></div>
+          <p id="difficulty-help" class="help"></p>
+          <p id="difficulty-error" class="error" role="alert" hidden></p>
+        </fieldset>
+
+        <label class="check" id="timer-field">
+          <input type="checkbox" id="timer-toggle">
+          <span data-i18n="setup.timerLabel"></span>
+        </label>
+
+        <div class="actions">
+          <button type="button" id="btn-setup-back" class="btn btn-ghost" data-i18n="setup.back"></button>
+          <button type="submit" class="btn btn-primary" data-i18n="setup.continue"></button>
+        </div>
+      </form>
+    </section>
+
+    <!-- 3. WHEEL -->
+    <section id="screen-wheel" class="screen" aria-labelledby="wheel-title" hidden>
+      <h2 id="wheel-title" class="center" data-focus tabindex="-1"></h2>
+      <p id="session-chip" class="chip center-chip"></p>
+
+      <div class="wheel-wrap">
+        <div class="wheel-pointer" aria-hidden="true"></div>
+        <div id="wheel" class="wheel" role="img"></div>
+      </div>
+
+      <div id="spin-controls" class="stack">
+        <button type="button" id="btn-spin" class="btn btn-primary btn-lg" data-i18n="wheel.spin"></button>
+        <details id="manual-pick" class="manual">
+          <summary data-i18n="wheel.choose"></summary>
+          <p class="help" data-i18n="wheel.chooseHelp"></p>
+          <div id="manual-list" class="chip-grid"></div>
+        </details>
+        <button type="button" id="btn-change-setup" class="btn btn-ghost" data-i18n="wheel.change"></button>
+      </div>
+
+      <div id="wheel-result" class="card result-panel" hidden></div>
+      <div id="wheel-live" class="sr-only" role="status" aria-live="polite"></div>
+    </section>
+
+    <!-- 4. CHALLENGE -->
+    <section id="screen-challenge" class="screen" aria-label="Challenge" hidden>
+      <div class="challenge-head">
+        <p id="challenge-kind" class="badge"></p>
+        <p id="progress-text" class="progress-text" data-focus tabindex="-1"></p>
+        <div class="progress" id="progress" role="progressbar" aria-valuemin="0" aria-valuemax="5" aria-valuenow="0" aria-labelledby="progress-text"><div id="progress-bar"></div></div>
+        <div class="head-row">
+          <span id="score-chip" class="chip"></span>
+          <span id="timer" class="timer" role="timer" aria-live="off" hidden>
+            <span id="timer-text"></span>
+            <span class="timer-track"><span id="timer-fill"></span></span>
+          </span>
+        </div>
+      </div>
+
+      <article class="card q-card">
+        <p id="sample-badge" class="sample-badge" hidden></p>
+        <h2 id="question-text" class="question" tabindex="-1"></h2>
+        <figure id="question-figure" class="question-figure" hidden>
+          <img id="question-image" alt="" width="320" height="240">
+          <figcaption data-i18n="challenge.imageCaption"></figcaption>
+        </figure>
+        <div id="answer-area" class="answer-area"></div>
+        <div id="feedback" class="feedback" tabindex="-1" hidden></div>
+        <div class="actions end">
+          <button type="button" id="btn-next" class="btn btn-primary" hidden></button>
+        </div>
+      </article>
+    </section>
+
+    <!-- 5. RESULTS -->
+    <section id="screen-results" class="screen" aria-labelledby="results-title" hidden>
+      <div class="card results-card">
+        <h2 id="results-title" data-focus tabindex="-1" data-i18n="results.title"></h2>
+        <p id="results-kind" class="badge center-chip"></p>
+        <div class="score-ring" aria-live="polite">
+          <span id="score-percent" class="score-percent"></span>
+          <span id="score-fraction" class="score-fraction"></span>
+        </div>
+        <p id="results-message" class="message"></p>
+        <dl class="stats" id="results-stats"></dl>
+        <p class="fineprint" data-i18n="results.pointsNote"></p>
+
+        <h3 data-i18n="results.review"></h3>
+        <p class="help" data-i18n="results.reviewHelp"></p>
+        <div id="review-list" class="review-list"></div>
+
+        <div class="actions wrap">
+          <button type="button" id="btn-spin-again" class="btn btn-primary" data-i18n="results.spinAgain"></button>
+          <button type="button" id="btn-another" class="btn btn-secondary" data-i18n="results.another"></button>
+          <button type="button" id="btn-home" class="btn btn-ghost" data-i18n="results.home"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. ERROR / EMPTY -->
+    <section id="screen-error" class="screen" aria-labelledby="error-title" hidden>
+      <div class="card center">
+        <p class="big-emoji" aria-hidden="true">🛠️</p>
+        <h2 id="error-title" data-focus tabindex="-1" data-i18n="bank.errorTitle"></h2>
+        <p id="error-message"></p>
+        <p class="help" data-i18n="bank.errorHelp"></p>
+        <div class="actions">
+          <button type="button" id="btn-error-retry" class="btn btn-primary" data-i18n="bank.retry"></button>
+          <button type="button" id="btn-error-home" class="btn btn-ghost" data-i18n="results.home"></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><p data-i18n="app.footer"></p></footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/strings.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/wheel.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
